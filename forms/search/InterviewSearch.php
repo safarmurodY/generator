@@ -1,15 +1,15 @@
 <?php
 
-namespace app\models\search;
+namespace app\forms\search;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Log;
+use app\models\Interview;
 
 /**
- * LogSearch represents the model behind the search form of `app\models\Log`.
+ * InterviewSearch represents the model behind the search form of `app\models\Interview`.
  */
-class LogSearch extends Log
+class InterviewSearch extends Interview
 {
     /**
      * {@inheritdoc}
@@ -17,8 +17,8 @@ class LogSearch extends Log
     public function rules()
     {
         return [
-            [['id', 'created_at', 'user_id'], 'integer'],
-            [['message'], 'safe'],
+            [['id', 'status', 'employee_id'], 'integer'],
+            [['date', 'first_name', 'last_name', 'email', 'reject_reason'], 'safe'],
         ];
     }
 
@@ -40,7 +40,7 @@ class LogSearch extends Log
      */
     public function search($params)
     {
-        $query = Log::find();
+        $query = Interview::find();
 
         // add conditions that should always apply here
 
@@ -59,11 +59,15 @@ class LogSearch extends Log
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'created_at' => $this->created_at,
-            'user_id' => $this->user_id,
+            'date' => $this->date,
+            'status' => $this->status,
+            'employee_id' => $this->employee_id,
         ]);
 
-        $query->andFilterWhere(['like', 'message', $this->message]);
+        $query->andFilterWhere(['like', 'first_name', $this->first_name])
+            ->andFilterWhere(['like', 'last_name', $this->last_name])
+            ->andFilterWhere(['like', 'email', $this->email])
+            ->andFilterWhere(['like', 'reject_reason', $this->reject_reason]);
 
         return $dataProvider;
     }

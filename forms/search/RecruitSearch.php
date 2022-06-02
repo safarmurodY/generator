@@ -1,15 +1,15 @@
 <?php
 
-namespace app\models\search;
+namespace app\forms\search;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Bonus as BonusModel;
+use app\models\Recruit;
 
 /**
- * Bonus represents the model behind the search form of `app\models\Bonus`.
+ * RecruitSearch represents the model behind the search form of `app\models\Recruit`.
  */
-class Bonus extends BonusModel
+class RecruitSearch extends Recruit
 {
     /**
      * {@inheritdoc}
@@ -17,7 +17,8 @@ class Bonus extends BonusModel
     public function rules()
     {
         return [
-            [['id', 'order_id', 'employee_id', 'cost'], 'integer'],
+            [['id', 'order_id', 'employee_id'], 'integer'],
+            [['date'], 'safe'],
         ];
     }
 
@@ -39,7 +40,7 @@ class Bonus extends BonusModel
      */
     public function search($params)
     {
-        $query = BonusModel::find();
+        $query = Recruit::find();
 
         // add conditions that should always apply here
 
@@ -60,7 +61,7 @@ class Bonus extends BonusModel
             'id' => $this->id,
             'order_id' => $this->order_id,
             'employee_id' => $this->employee_id,
-            'cost' => $this->cost,
+            'date' => $this->date,
         ]);
 
         return $dataProvider;

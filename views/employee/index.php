@@ -1,12 +1,13 @@
 <?php
 
+use app\models\Employee;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\search\EmployeeSearch */
+/* @var $searchModel app\forms\search\EmployeeSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('app', 'Employees');
@@ -33,7 +34,11 @@ $this->params['breadcrumbs'][] = $this->title;
             'last_name',
             'address',
             'email:email',
-            //'status',
+            [
+                'attribute' => 'status',
+                'filter' => Employee::getStatusList(),
+                'value' => 'statusName'
+            ],
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Employee $model, $key, $index, $column) {

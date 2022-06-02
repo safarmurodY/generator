@@ -1,15 +1,15 @@
 <?php
 
-namespace app\models\search;
+namespace app\forms\search;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Position;
+use app\models\Bonus;
 
 /**
- * PositionSearch represents the model behind the search form of `app\models\Position`.
+ * Bonus represents the model behind the search form of `app\models\Bonus`.
  */
-class PositionSearch extends Position
+class BonusSearch extends Bonus
 {
     /**
      * {@inheritdoc}
@@ -17,8 +17,7 @@ class PositionSearch extends Position
     public function rules()
     {
         return [
-            [['id'], 'integer'],
-            [['name'], 'safe'],
+            [['id', 'order_id', 'employee_id', 'cost'], 'integer'],
         ];
     }
 
@@ -40,7 +39,7 @@ class PositionSearch extends Position
      */
     public function search($params)
     {
-        $query = Position::find();
+        $query = Bonus::find();
 
         // add conditions that should always apply here
 
@@ -59,9 +58,10 @@ class PositionSearch extends Position
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'order_id' => $this->order_id,
+            'employee_id' => $this->employee_id,
+            'cost' => $this->cost,
         ]);
-
-        $query->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;
     }

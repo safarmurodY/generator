@@ -1,15 +1,15 @@
 <?php
 
-namespace app\models\search;
+namespace app\forms\search;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Contract;
+use app\models\Dismiss;
 
 /**
- * ContractSearch represents the model behind the search form of `app\models\Contract`.
+ * DismissSearch represents the model behind the search form of `app\models\Dismiss`.
  */
-class ContractSearch extends Contract
+class DismissSearch extends Dismiss
 {
     /**
      * {@inheritdoc}
@@ -17,8 +17,8 @@ class ContractSearch extends Contract
     public function rules()
     {
         return [
-            [['id', 'employee_id'], 'integer'],
-            [['first_name', 'last_name', 'date_open', 'date_close', 'close_reason'], 'safe'],
+            [['id', 'order_id', 'employee_id'], 'integer'],
+            [['date', 'reason'], 'safe'],
         ];
     }
 
@@ -40,7 +40,7 @@ class ContractSearch extends Contract
      */
     public function search($params)
     {
-        $query = Contract::find();
+        $query = Dismiss::find();
 
         // add conditions that should always apply here
 
@@ -59,14 +59,12 @@ class ContractSearch extends Contract
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'order_id' => $this->order_id,
             'employee_id' => $this->employee_id,
-            'date_open' => $this->date_open,
-            'date_close' => $this->date_close,
+            'date' => $this->date,
         ]);
 
-        $query->andFilterWhere(['like', 'first_name', $this->first_name])
-            ->andFilterWhere(['like', 'last_name', $this->last_name])
-            ->andFilterWhere(['like', 'close_reason', $this->close_reason]);
+        $query->andFilterWhere(['like', 'reason', $this->reason]);
 
         return $dataProvider;
     }

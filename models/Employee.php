@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "employee".
@@ -21,8 +23,34 @@ use Yii;
  * @property Recruit[] $recruits
  * @property Vacation[] $vacations
  */
-class Employee extends \yii\db\ActiveRecord
+class Employee extends ActiveRecord
 {
+    const STATUS_PROBATION = 1;
+    const STATUS_WORK = 2;
+    const STATUS_VACATION = 3;
+    const STATUS_DISMISS = 4;
+
+    public static function getStatusList()
+    {
+        return [
+            self::STATUS_PROBATION => 'Probation',
+            self::STATUS_WORK => 'Work',
+            self::STATUS_VACATION => 'Vacation',
+            self::STATUS_DISMISS => 'Dismiss',
+        ];
+    }
+
+    public function getStatusName()
+    {
+        return ArrayHelper::getValue(self::getStatusList(), $this->status);
+    }
+
+    public function getFullName()
+    {
+        return $this->last_name . ' ' . $this->first_name;
+    }
+    
+    
     /**
      * {@inheritdoc}
      */

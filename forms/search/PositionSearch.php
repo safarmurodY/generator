@@ -1,15 +1,15 @@
 <?php
 
-namespace app\models\search;
+namespace app\forms\search;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Interview;
+use app\models\Position;
 
 /**
- * InterviewSearch represents the model behind the search form of `app\models\Interview`.
+ * PositionSearch represents the model behind the search form of `app\models\Position`.
  */
-class InterviewSearch extends Interview
+class PositionSearch extends Position
 {
     /**
      * {@inheritdoc}
@@ -17,8 +17,8 @@ class InterviewSearch extends Interview
     public function rules()
     {
         return [
-            [['id', 'status', 'employee_id'], 'integer'],
-            [['date', 'first_name', 'last_name', 'email', 'reject_reason'], 'safe'],
+            [['id'], 'integer'],
+            [['name'], 'safe'],
         ];
     }
 
@@ -40,7 +40,7 @@ class InterviewSearch extends Interview
      */
     public function search($params)
     {
-        $query = Interview::find();
+        $query = Position::find();
 
         // add conditions that should always apply here
 
@@ -59,15 +59,9 @@ class InterviewSearch extends Interview
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'date' => $this->date,
-            'status' => $this->status,
-            'employee_id' => $this->employee_id,
         ]);
 
-        $query->andFilterWhere(['like', 'first_name', $this->first_name])
-            ->andFilterWhere(['like', 'last_name', $this->last_name])
-            ->andFilterWhere(['like', 'email', $this->email])
-            ->andFilterWhere(['like', 'reject_reason', $this->reject_reason]);
+        $query->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;
     }

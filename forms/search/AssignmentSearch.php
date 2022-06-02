@@ -1,15 +1,15 @@
 <?php
 
-namespace app\models\search;
+namespace app\forms\search;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Vacation;
+use app\models\Assignment;
 
 /**
- * VacationSearch represents the model behind the search form of `app\models\Vacation`.
+ * AssignmentSearch represents the model behind the search form of `app\models\Assignment`.
  */
-class VacationSearch extends Vacation
+class AssignmentSearch extends Assignment
 {
     /**
      * {@inheritdoc}
@@ -17,8 +17,9 @@ class VacationSearch extends Vacation
     public function rules()
     {
         return [
-            [['id', 'order_id', 'employee_id'], 'integer'],
-            [['date_from', 'date_to'], 'safe'],
+            [['id', 'order_id', 'employee_id', 'position_id', 'salary', 'active'], 'integer'],
+            [['date'], 'safe'],
+            [['rate'], 'number'],
         ];
     }
 
@@ -40,7 +41,7 @@ class VacationSearch extends Vacation
      */
     public function search($params)
     {
-        $query = Vacation::find();
+        $query = Assignment::find();
 
         // add conditions that should always apply here
 
@@ -61,8 +62,11 @@ class VacationSearch extends Vacation
             'id' => $this->id,
             'order_id' => $this->order_id,
             'employee_id' => $this->employee_id,
-            'date_from' => $this->date_from,
-            'date_to' => $this->date_to,
+            'position_id' => $this->position_id,
+            'date' => $this->date,
+            'rate' => $this->rate,
+            'salary' => $this->salary,
+            'active' => $this->active,
         ]);
 
         return $dataProvider;

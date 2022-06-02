@@ -1,15 +1,15 @@
 <?php
 
-namespace app\models\search;
+namespace app\forms\search;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Assignment;
+use app\models\Log;
 
 /**
- * AssignmentSearch represents the model behind the search form of `app\models\Assignment`.
+ * LogSearch represents the model behind the search form of `app\models\Log`.
  */
-class AssignmentSearch extends Assignment
+class LogSearch extends Log
 {
     /**
      * {@inheritdoc}
@@ -17,9 +17,8 @@ class AssignmentSearch extends Assignment
     public function rules()
     {
         return [
-            [['id', 'order_id', 'employee_id', 'position_id', 'salary', 'active'], 'integer'],
-            [['date'], 'safe'],
-            [['rate'], 'number'],
+            [['id', 'created_at', 'user_id'], 'integer'],
+            [['message'], 'safe'],
         ];
     }
 
@@ -41,7 +40,7 @@ class AssignmentSearch extends Assignment
      */
     public function search($params)
     {
-        $query = Assignment::find();
+        $query = Log::find();
 
         // add conditions that should always apply here
 
@@ -60,14 +59,11 @@ class AssignmentSearch extends Assignment
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'order_id' => $this->order_id,
-            'employee_id' => $this->employee_id,
-            'position_id' => $this->position_id,
-            'date' => $this->date,
-            'rate' => $this->rate,
-            'salary' => $this->salary,
-            'active' => $this->active,
+            'created_at' => $this->created_at,
+            'user_id' => $this->user_id,
         ]);
+
+        $query->andFilterWhere(['like', 'message', $this->message]);
 
         return $dataProvider;
     }

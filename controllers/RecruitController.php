@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use app\models\Recruit;
-use app\models\search\RecruitSearch;
+use app\forms\search\RecruitSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -129,6 +129,6 @@ class RecruitController extends Controller
             return $model;
         }
 
-        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+        throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }
 }

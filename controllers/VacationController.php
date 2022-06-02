@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use app\models\Vacation;
-use app\models\search\VacationSearch;
+use app\forms\search\VacationSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -129,6 +129,6 @@ class VacationController extends Controller
             return $model;
         }
 
-        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+        throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }
 }

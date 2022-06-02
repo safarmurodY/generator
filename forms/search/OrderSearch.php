@@ -1,15 +1,15 @@
 <?php
 
-namespace app\models\search;
+namespace app\forms\search;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Employee;
+use app\models\Order;
 
 /**
- * EmployeeSearch represents the model behind the search form of `app\models\Employee`.
+ * OrderSearch represents the model behind the search form of `app\models\Order`.
  */
-class EmployeeSearch extends Employee
+class OrderSearch extends Order
 {
     /**
      * {@inheritdoc}
@@ -17,8 +17,8 @@ class EmployeeSearch extends Employee
     public function rules()
     {
         return [
-            [['id', 'status'], 'integer'],
-            [['first_name', 'last_name', 'address', 'email'], 'safe'],
+            [['id'], 'integer'],
+            [['date'], 'safe'],
         ];
     }
 
@@ -40,7 +40,7 @@ class EmployeeSearch extends Employee
      */
     public function search($params)
     {
-        $query = Employee::find();
+        $query = Order::find();
 
         // add conditions that should always apply here
 
@@ -59,13 +59,8 @@ class EmployeeSearch extends Employee
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'status' => $this->status,
+            'date' => $this->date,
         ]);
-
-        $query->andFilterWhere(['like', 'first_name', $this->first_name])
-            ->andFilterWhere(['like', 'last_name', $this->last_name])
-            ->andFilterWhere(['like', 'address', $this->address])
-            ->andFilterWhere(['like', 'email', $this->email]);
 
         return $dataProvider;
     }
