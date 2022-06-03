@@ -1,12 +1,13 @@
 <?php
 
+use app\models\Recruit;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\search\RecruitSearch */
+/* @var $searchModel app\forms\search\RecruitSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('app', 'Recruits');

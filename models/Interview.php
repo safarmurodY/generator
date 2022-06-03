@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "interview".
@@ -18,8 +20,60 @@ use Yii;
  *
  * @property Employee $employee
  */
-class Interview extends \yii\db\ActiveRecord
+class Interview extends ActiveRecord
 {
+    const SCENARIO_CREATE = 'create';
+
+    const STATUS_NEW = 1;
+    const STATUS_PASS = 2;
+    const STATUS_REJECT = 3;
+
+    public static function getStatusList()
+    {
+        return [
+            self::STATUS_NEW => 'New',
+            self::STATUS_PASS => 'Passed',
+            self::STATUS_REJECT => 'Rejected',
+        ];
+    }
+
+    public function getStatusName()
+    {
+        return ArrayHelper::getValue(self::getStatusList(), $this->status);
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        if (in_array('status', array_keys($changedAttributes)) && $this->status != $changedAttributes['status']) {
+            if ($this->status == self::STATUS_NEW) {
+                if ($this->email) {
+                    Yii::$app->mailer->compose('interview/join', ['model' => $this])
+                        ->setFrom(Yii::$app->params['adminMail'])
+                        ->setTo($this->email)
+                        ->setSubject('You are joined interview')
+                        ->send();
+                }
+            } elseif ($this->status == self::STATUS_PASS) {
+                if ($this->email) {
+                    Yii::$app->mailer->compose('interview/join', ['model' => $this])
+                        ->setFrom(Yii::$app->params['adminMail'])
+                        ->setTo($this->email)
+                        ->setSubject('Passed')
+                        ->send();
+                }
+            } elseif ($this->status == self::STATUS_REJECT) {
+                if ($this->email) {
+                    Yii::$app->mailer->compose('interview/join', ['model' => $this])
+                        ->setFrom(Yii::$app->params['adminMail'])
+                        ->setTo($this->email)
+                        ->setSubject('You are rejected')
+                        ->send();
+                }
+            }
+        }
+        parent::afterSave($insert, $changedAttributes);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -34,9 +88,17 @@ class Interview extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['date', 'first_name', 'last_name', 'status'], 'required'],
+            [['date', 'first_name', 'last_name'], 'required'],
+            [['status'], 'required', 'except' => self::SCENARIO_CREATE],
+            [['status'], 'default', 'value' => self::STATUS_NEW],
+            [['reject_reason'], 'required', 'when' => function (self $model) {
+                return $model->status == self::STATUS_REJECT;
+            }, 'whenClient' => "function(attribute, value){
+                    return $('#interview-status').val() == '" . self::STATUS_REJECT . "';
+                }"
+            ],
             [['date'], 'safe'],
-            [['status', 'employee_id'], 'integer'],
+            [['status', 'employee_id'], 'integer', 'except' => self::SCENARIO_CREATE],
             [['reject_reason'], 'string'],
             [['first_name', 'last_name', 'email'], 'string', 'max' => 255],
             [['employee_id'], 'exist', 'skipOnError' => true, 'targetClass' => Employee::className(), 'targetAttribute' => ['employee_id' => 'id']],
