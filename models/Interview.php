@@ -42,33 +42,75 @@ class Interview extends ActiveRecord
         return ArrayHelper::getValue(self::getStatusList(), $this->status);
     }
 
+    public function getNextStatusList()
+    {
+        if ($this->status == self::STATUS_PASS){
+            return [
+                self::STATUS_PASS => 'Passed',
+            ];
+        }elseif ($this->status == self::STATUS_REJECT){
+            return [
+                self::STATUS_PASS => 'Passed',
+                self::STATUS_REJECT => 'Rejected',
+            ];
+        }else{
+            return [
+                self::STATUS_NEW => 'New',
+                self::STATUS_PASS => 'Passed',
+                self::STATUS_REJECT => 'Rejected',
+            ];
+        }
+    }
+
+    public static function create($last_name, $first_name, $email, $date): Interview
+    {
+        $interview = new Interview();
+        $interview->date = $date;
+        $interview->last_name = $last_name;
+        $interview->first_name = $first_name;
+        $interview->email = $email;
+        $interview->status = Interview::STATUS_NEW;
+        return $interview;
+    }
+    public function editData($last_name, $first_name, $email)
+    {
+        $this->last_name = $last_name;
+        $this->first_name = $first_name;
+        $this->email = $email;
+    }
+    public function reject($reason)
+    {
+        $this->reject_reason = $reason;
+        $this->status = self::STATUS_REJECT;
+    }
+    
     public function afterSave($insert, $changedAttributes)
     {
         if (in_array('status', array_keys($changedAttributes)) && $this->status != $changedAttributes['status']) {
             if ($this->status == self::STATUS_NEW) {
-                if ($this->email) {
-                    Yii::$app->mailer->compose('interview/join', ['model' => $this])
-                        ->setFrom(Yii::$app->params['adminMail'])
-                        ->setTo($this->email)
-                        ->setSubject('You are joined interview')
-                        ->send();
-                }
+
             } elseif ($this->status == self::STATUS_PASS) {
-                if ($this->email) {
-                    Yii::$app->mailer->compose('interview/join', ['model' => $this])
-                        ->setFrom(Yii::$app->params['adminMail'])
-                        ->setTo($this->email)
-                        ->setSubject('Passed')
-                        ->send();
-                }
+//                if ($this->email) {
+//                    Yii::$app->mailer->compose('interview/join', ['model' => $this])
+//                        ->setFrom(Yii::$app->params['adminMail'])
+//                        ->setTo($this->email)
+//                        ->setSubject('Passed')
+//                        ->send();
+//                }
+                $log = new Log();
+                $log->message = $this->last_name . ' ' . $this->first_name . ' Passed';
+                $log->save();
             } elseif ($this->status == self::STATUS_REJECT) {
-                if ($this->email) {
-                    Yii::$app->mailer->compose('interview/join', ['model' => $this])
-                        ->setFrom(Yii::$app->params['adminMail'])
-                        ->setTo($this->email)
-                        ->setSubject('You are rejected')
-                        ->send();
-                }
+//                if ($this->email) {
+//                    Yii::$app->mailer->compose('interview/join', ['model' => $this])
+//                        ->setFrom(Yii::$app->params['adminMail'])
+//                        ->setTo($this->email)
+//                        ->setSubject('You are rejected')
+//                        ->send();
+//                }
+                $log = new Log();
+                $log->message = $this->last_name . ' ' . $this->first_name . ' Rejected';
+                $log->save();
             }
         }
         parent::afterSave($insert, $changedAttributes);

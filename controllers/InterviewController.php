@@ -2,8 +2,12 @@
 
 namespace app\controllers;
 
+use app\forms\InterviewEditForm;
+use app\forms\InterviewJoinForm;
+use app\forms\InterviewRejectForm;
 use app\models\Interview;
 use app\forms\search\InterviewSearch;
+use app\services\StaffService;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -25,6 +29,7 @@ class InterviewController extends Controller
                     'class' => VerbFilter::className(),
                     'actions' => [
                         'delete' => ['POST'],
+                        'reject' => ['POST'],
                     ],
                 ],
             ]
@@ -84,6 +89,25 @@ class InterviewController extends Controller
             'model' => $model,
         ]);
     }
+    public function actionJoin()
+    {
+        $form = new InterviewJoinForm();
+        if ($this->request->isPost
+            && $form->load($this->request->post())
+            && $form->validate()){
+            $service = new StaffService();
+            $model = $service->joinToInterview(
+                $form->last_name,
+                $form->first_name,
+                $form->email,
+                $form->date);
+            return $this->redirect(['view', 'id' => $model->id]);
+
+        }
+        return $this->render('join', [
+            'joinForm' => $form,
+        ]);
+    }
 
     /**
      * Updates an existing Interview model.
@@ -95,8 +119,37 @@ class InterviewController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $form = new InterviewEditForm($model);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+        if ($this->request->isPost && $form->load($this->request->post()) && $form->validate()) {
+            $service = new StaffService();
+            $service->editInterview(
+                $model->id,
+                $form->last_name,
+                $form->first_name,
+                $form->email
+            );
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+        return $this->render('update', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * @param $id
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionReject($id)
+    {
+        $model = $this->findModel($id);
+        $form = new InterviewRejectForm();
+
+        if ($this->request->isPost && $form->load($this->request->post()) && $form->validate()) {
+            $service = new StaffService();
+            $service->rejectInterview($model->id, $form->reason);
             return $this->redirect(['view', 'id' => $model->id]);
         }
 

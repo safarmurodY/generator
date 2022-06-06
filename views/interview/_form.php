@@ -25,7 +25,7 @@ use yii\bootstrap4\ActiveForm;
 
     <?php if($model->scenario == $model::SCENARIO_DEFAULT): ?>
 
-        <?= $form->field($model, 'status')->dropDownList(Interview::getStatusList(), ['id' => 'interview-status']) ?>
+        <?= $form->field($model, 'status')->dropDownList($model->getNextStatusList()) ?>
 
         <?= $form->field($model, 'reject_reason')->textarea(['rows' => 6]) ?>
 

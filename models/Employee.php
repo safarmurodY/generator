@@ -30,6 +30,12 @@ class Employee extends ActiveRecord
     const STATUS_VACATION = 3;
     const STATUS_DISMISS = 4;
 
+    const SCENARIO_CREATE = 'create';
+
+    public $order_date;
+    public $contract_date;
+    public $recruit_date;
+
     public static function getStatusList()
     {
         return [
@@ -49,7 +55,46 @@ class Employee extends ActiveRecord
     {
         return $this->last_name . ' ' . $this->first_name;
     }
-    
+    public function afterSave($insert, $changedAttributes)
+    {
+        if (in_array('status', array_keys($changedAttributes)) && $this->status != $changedAttributes['status']) {
+            if ($this->status == self::STATUS_PROBATION) {
+//                if ($this->email) {
+//                    Yii::$app->mailer->compose('employee/probation', ['model' => $this])
+//                        ->setFrom(Yii::$app->params['adminMail'])
+//                        ->setTo($this->email)
+//                        ->setSubject(' Probation ')
+//                        ->send();
+//                }
+                $log = new Log();
+                $log->message = $this->last_name . ' ' . $this->first_name . ' Joined';
+                $log->save();
+            } elseif ($this->status == self::STATUS_WORK) {
+//                if ($this->email) {
+//                    Yii::$app->mailer->compose('employee/work', ['model' => $this])
+//                        ->setFrom(Yii::$app->params['adminMail'])
+//                        ->setTo($this->email)
+//                        ->setSubject('You are recruit')
+//                        ->send();
+//                }
+                $log = new Log();
+                $log->message = $this->last_name . ' ' . $this->first_name . ' Passed';
+                $log->save();
+            } elseif ($this->status == self::STATUS_DISMISS) {
+//                if ($this->email) {
+//                    Yii::$app->mailer->compose('employee/dismiss', ['model' => $this])
+//                        ->setFrom(Yii::$app->params['adminMail'])
+//                        ->setTo($this->email)
+//                        ->setSubject('You are rejected')
+//                        ->send();
+//                }
+                $log = new Log();
+                $log->message = $this->last_name . ' ' . $this->first_name . ' Rejected';
+                $log->save();
+            }
+        }
+        parent::afterSave($insert, $changedAttributes);
+    }
     
     /**
      * {@inheritdoc}
@@ -67,6 +112,8 @@ class Employee extends ActiveRecord
         return [
             [['first_name', 'last_name', 'address', 'status'], 'required'],
             [['status'], 'integer'],
+            [['order_date', 'contract_date', 'recruit_date'], 'required', 'on' => self::SCENARIO_CREATE],
+            [['order_date', 'contract_date', 'recruit_date'], 'date', 'on' => self::SCENARIO_CREATE],
             [['first_name', 'last_name', 'address', 'email'], 'string', 'max' => 255],
         ];
     }
