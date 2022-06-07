@@ -1,11 +1,11 @@
 <?php
 
-use app\forms\InterviewJoinForm;
+use app\forms\InterviewInviteForm;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $joinForm InterviewJoinForm */
+/* @var $joinForm InterviewInviteForm */
 /* @var $form yii\bootstrap4\ActiveForm */
 
 $this->title = 'Join Form';
@@ -14,6 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 ?>
 <div class="interview-join-form">
+
     <h1><?= Html::encode($this->title) ?></h1>
 
     <div class="form">

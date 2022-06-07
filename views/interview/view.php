@@ -18,9 +18,13 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->id],
             ['class' => 'btn btn-primary']) ?>
-        <?= Html::a(Yii::t('app', 'Recruit'),
-            ['employee/create', 'interview_id' => $model->id],
-            ['class' => 'btn btn-success']) ?>
+
+        <?php if($model->isRecruitable()): ?>
+            <?= Html::a(Yii::t('app', 'Recruit'),
+                ['employee/create', 'interview_id' => $model->id],
+                ['class' => 'btn btn-success']) ?>
+        <?php endif; ?>
+
         <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
@@ -28,13 +32,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
-        <?= Html::a(Yii::t('app', 'Reject'), ['reject', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => Yii::t('app', 'Are you sure you want to Reject interview?'),
-                'method' => 'post',
-            ],
-        ]) ?>
+
+        <?= Html::a(Yii::t('app', 'Reject'),
+            ['reject', 'id' => $model->id],
+            ['class' => 'btn btn-danger',]) ?>
     </p>
 
     <?= DetailView::widget([
@@ -45,7 +46,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'first_name',
             'last_name',
             'email:email',
-            'status',
+            [
+                'attribute' => 'status',
+                'value' => function($model){
+                    return $model->statusName;
+                },
+                'format' => 'raw',
+            ],
             'reject_reason:ntext',
             'employee_id',
         ],

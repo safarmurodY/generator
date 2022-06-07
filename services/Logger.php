@@ -4,7 +4,7 @@ namespace app\services;
 
 use app\models\Log;
 
-class Logger
+class Logger implements LoggerInterface
 {
     public function log($message)
     {

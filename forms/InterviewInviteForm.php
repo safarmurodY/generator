@@ -4,7 +4,7 @@ namespace app\forms;
 
 use yii\base\Model;
 
-class InterviewJoinForm extends Model
+class InterviewInviteForm extends Model
 {
     public $date;
     public $first_name;

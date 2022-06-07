@@ -4,7 +4,7 @@ namespace app\services;
 
 use Yii;
 
-class Notifier
+class Notifier implements NotifierInterface
 {
     public function notify($view, $data, $email, $subject)
     {

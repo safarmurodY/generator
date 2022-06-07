@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\forms\EmpoloyeeCreateForm;
 use app\models\Contract;
 use app\models\Employee;
 use app\forms\search\EmployeeSearch;
@@ -74,53 +75,13 @@ class EmployeeController extends Controller
     public function actionCreate($interview_id = null)
     {
         $model = new Employee();
-        $model->order_date = date('Y-m-d');
-        $model->contract_date = date('Y-m-d');
-        $model->recruit_date = date('Y-m-d');
+        $interview = ($interview_id) ? $this->findInterviewModel($interview_id) : null;
+        $form = new EmpoloyeeCreateForm($interview);
 
-        if ($interview_id){
-            $interview = $this->findInterviewModel($interview_id);
-            $model->last_name = $interview->last_name;
-            $model->first_name = $interview->first_name;
-            $model->email = $interview->email;
-        }else{
-            $interview = null;
-        }
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->validate()) {
-                $transaction = \Yii::$app->db->beginTransaction();
-                try {
-                    if ($interview){
-                        $interview->status = Interview::STATUS_PASS;
-                        $interview->save();
-                    }
-                    $model->save(false);
-                    $order = new Order();
-                    $order->date = $model->order_date;
-                    $order->save(false);
+            if ($form->load($this->request->post()) && $form->validate()) {
 
-                    $contract = new Contract();
-                    $contract->employee_id = $model->id;
-                    $contract->first_name = $model->first_name;
-                    $contract->last_name = $model->last_name;
-                    $contract->date_open = $model->contract_date;
-                    $contract->save(false);
-
-                    $recruit = new Recruit();
-                    $recruit->employee_id = $model->id;
-                    $recruit->order_id = $order->id;
-                    $recruit->date = $model->recruit_date;
-                    $recruit->save(false);
-
-                    $transaction->commit();
-                    \Yii::$app->session->setFlash('success', 'Employee Recruit');
-                    return $this->redirect(['view', 'id' => $model->id]);
-
-                }catch (\Exception $e){
-                    $transaction->rollBack();
-                    throw new ServerErrorHttpException($e->getMessage());
-                }
 
             }
         } else {

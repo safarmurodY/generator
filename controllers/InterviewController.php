@@ -3,11 +3,13 @@
 namespace app\controllers;
 
 use app\forms\InterviewEditForm;
-use app\forms\InterviewJoinForm;
+use app\forms\InterviewInviteForm;
+use app\forms\InterviewMoveForm;
 use app\forms\InterviewRejectForm;
 use app\models\Interview;
 use app\forms\search\InterviewSearch;
 use app\services\StaffService;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -17,6 +19,14 @@ use yii\filters\VerbFilter;
  */
 class InterviewController extends Controller
 {
+    private $staffService;
+
+    public function __construct($id, $module, StaffService $staffService, $config = [])
+    {
+        $this->staffService = $staffService;
+        parent::__construct($id, $module, $config);
+    }
+
     /**
      * @inheritDoc
      */
@@ -29,7 +39,6 @@ class InterviewController extends Controller
                     'class' => VerbFilter::className(),
                     'actions' => [
                         'delete' => ['POST'],
-                        'reject' => ['POST'],
                     ],
                 ],
             ]
@@ -74,7 +83,7 @@ class InterviewController extends Controller
     {
         $model = new Interview();
 
-        $model->setScenario(Interview::SCENARIO_CREATE);
+//        $model->setScenario(Interview::SCENARIO_CREATE);
         $model->date = date('Y-m-d');
 
         if ($this->request->isPost) {
@@ -89,14 +98,16 @@ class InterviewController extends Controller
             'model' => $model,
         ]);
     }
-    public function actionJoin()
+
+
+    public function actionInvite()
     {
-        $form = new InterviewJoinForm();
+        $form = new InterviewInviteForm();
         if ($this->request->isPost
             && $form->load($this->request->post())
             && $form->validate()){
-            $service = new StaffService();
-            $model = $service->joinToInterview(
+//            $service = new StaffService();
+            $model = $this->staffService->joinToInterview(
                 $form->last_name,
                 $form->first_name,
                 $form->email,
@@ -104,7 +115,7 @@ class InterviewController extends Controller
             return $this->redirect(['view', 'id' => $model->id]);
 
         }
-        return $this->render('join', [
+        return $this->render('invite', [
             'joinForm' => $form,
         ]);
     }
@@ -122,8 +133,10 @@ class InterviewController extends Controller
         $form = new InterviewEditForm($model);
 
         if ($this->request->isPost && $form->load($this->request->post()) && $form->validate()) {
-            $service = new StaffService();
-            $service->editInterview(
+//            Yii::$container->get(StaffService::class);
+//            Yii::createObject(StaffService::class);
+//            $service = new StaffService();
+            $this->staffService->editInterview(
                 $model->id,
                 $form->last_name,
                 $form->first_name,
@@ -133,6 +146,28 @@ class InterviewController extends Controller
         }
 
         return $this->render('update', [
+            'editForm' => $form,
+            'model' => $model,
+        ]);
+    }
+    public function actionMove($id)
+    {
+        $model = $this->findModel($id);
+        $form = new InterviewMoveForm($model);
+
+        if ($this->request->isPost && $form->load($this->request->post()) && $form->validate()) {
+//            Yii::$container->get(StaffService::class);
+//            Yii::createObject(StaffService::class);
+//            $service = new StaffService();
+            $this->staffService->moveInterview(
+                $model->id,
+                $form->date,
+            );
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+        return $this->render('update', [
+            'editForm' => $form,
             'model' => $model,
         ]);
     }
@@ -145,15 +180,15 @@ class InterviewController extends Controller
     public function actionReject($id)
     {
         $model = $this->findModel($id);
-        $form = new InterviewRejectForm();
+        $rejectForm = new InterviewRejectForm();
 
-        if ($this->request->isPost && $form->load($this->request->post()) && $form->validate()) {
-            $service = new StaffService();
-            $service->rejectInterview($model->id, $form->reason);
+        if ($this->request->isPost && $rejectForm->load($this->request->post()) && $rejectForm->validate()) {
+            $this->staffService->rejectInterview($model->id, $rejectForm->reason);
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
-        return $this->render('update', [
+        return $this->render('reject', [
+            'rejectForm' => $rejectForm,
             'model' => $model,
         ]);
     }
@@ -185,6 +220,6 @@ class InterviewController extends Controller
             return $model;
         }
 
-        throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
+        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 }

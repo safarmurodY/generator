@@ -5,13 +5,10 @@ namespace app\repositories;
 use app\models\Interview;
 use yii\base\InvalidArgumentException;
 
-class InterviewRepository
+class InterviewRepository implements InterviewRepositoryInterface
 {
-    /**
-     * @param $id
-     * @return Interview
-     */
-    public function find($id): Interview
+
+    public function find($id)
     {
         if (!$interview = Interview::findOne($id)) {
             throw new InvalidArgumentException('Model not found');
@@ -20,9 +17,6 @@ class InterviewRepository
         return $interview;
     }
 
-    /**
-     * @throws \Throwable
-     */
     public function add(Interview $interview)
     {
         if (!$interview->isNewRecord) {
@@ -31,10 +25,7 @@ class InterviewRepository
         $interview->insert(false);
     }
 
-    /**
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
-     */
+
     public function save(Interview $interview)
     {
         if ($interview->isNewRecord) {
