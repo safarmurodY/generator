@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "order".
@@ -16,8 +17,15 @@ use Yii;
  * @property Recruit[] $recruits
  * @property Vacation[] $vacations
  */
-class Order extends \yii\db\ActiveRecord
+class Order extends ActiveRecord
 {
+    public static function create($date)
+    {
+        $order = new self();
+        $order->date = $date;
+        return $order;
+    }
+
     /**
      * {@inheritdoc}
      */

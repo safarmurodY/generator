@@ -64,6 +64,12 @@ class Interview extends ActiveRecord
         $this->reject_reason = $reason;
         $this->status = self::STATUS_REJECT;
     }
+    public function pass($employee_id)
+    {
+        $this->guardNotPass();
+        $this->employee_id = $employee_id;
+        $this->status = self::STATUS_PASS;
+    }
 
     public function move($date)
     {
@@ -71,19 +77,6 @@ class Interview extends ActiveRecord
         $this->date = $date;
     }
 
-    private function guardNotRejected()
-    {
-        if ($this->status == self::STATUS_REJECT){
-            throw new \DomainException('Already rejected');
-        }
-    }
-
-    private function guardNotCurrentDate($date)
-    {
-        if($this->date == $date){
-            throw new \DomainException('Inserted date is equal with before one');
-        }
-    }
 
     public function isRecruitable(): bool
     {
@@ -128,5 +121,26 @@ class Interview extends ActiveRecord
     public function getFullName()
     {
         return $this->last_name . ' ' . $this->first_name;
+    }
+
+
+    private function guardNotRejected()
+    {
+        if ($this->status == self::STATUS_REJECT){
+            throw new \DomainException('Already rejected');
+        }
+    }
+
+    private function guardNotCurrentDate($date)
+    {
+        if($this->date == $date){
+            throw new \DomainException('Inserted date is equal with before one');
+        }
+    }
+
+    private function guardNotPass()
+    {
+        if ($this->status == self::STATUS_PASS)
+            throw new \DomainException('Already Passed');
     }
 }

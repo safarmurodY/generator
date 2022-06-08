@@ -9,6 +9,7 @@ use app\forms\search\EmployeeSearch;
 use app\models\Interview;
 use app\models\Order;
 use app\models\Recruit;
+use app\services\StaffService;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -19,6 +20,20 @@ use yii\web\ServerErrorHttpException;
  */
 class EmployeeController extends Controller
 {
+    private $staffService;
+
+    /**
+     * @param $id
+     * @param $module
+     * @param StaffService $staffService
+     * @param $config
+     */
+    public function __construct($id, $module, StaffService $staffService, $config = [])
+    {
+        $this->staffService = $staffService;
+        parent::__construct($id, $module, $config);
+    }
+
     /**
      * @inheritDoc
      */
@@ -67,25 +82,34 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Creates a new Employee model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @param $interview_id
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException
+     * @throws \Throwable
      */
     public function actionCreate($interview_id = null)
     {
         $model = new Employee();
         $interview = ($interview_id) ? $this->findInterviewModel($interview_id) : null;
+        /**  @var $interview Interview */
         $form = new EmpoloyeeCreateForm($interview);
 
 
-        if ($this->request->isPost) {
-            if ($form->load($this->request->post()) && $form->validate()) {
+        if ($this->request->isPost && $form->load($this->request->post()) && $form->validate()) {
 
-
-            }
-        } else {
-            $model->loadDefaultValues();
+            /** @var Employee $employee */
+            $employee = $this->staffService->createEmployee(
+                $interview_id,
+                $form->first_name,
+                $form->last_name,
+                $form->email,
+                $form->address,
+                $form->order_date,
+                $form->contract_date,
+                $form->recruit_date,
+            );
+            \Yii::$app->session->setFlash('success', 'Employee Recruit');
+            return $this->redirect(['view', 'id' => $employee->id]);
         }
 
         return $this->render('create', [

@@ -11,13 +11,18 @@ class EmpoloyeeCreateForm extends Model
     public $last_name;
     public $email;
     public $address;
+    //------------------//
     public $order_date;
     public $contract_date;
     public $recruit_date;
 
     private $interview;
 
-    public function __construct(Interview $interview = null, $config = [])
+    /**
+     * @param Interview|null $interview
+     * @param array $config
+     */
+    public function __construct(Interview $interview = null, array $config = [])
     {
         if ($interview){
             $this->interview = $interview;
